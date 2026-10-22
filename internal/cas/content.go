@@ -1,3 +1,10 @@
 package cas
 
-type Content interface{}
+import (
+	"io"
+)
+
+type Content interface {
+	io.Closer
+	io.Reader
+}
