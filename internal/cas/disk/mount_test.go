@@ -31,7 +31,8 @@ func TestMount_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mount := NewMount()
+			tempPath := t.TempDir()
+			mount := NewMount(TargetPath(tempPath))
 			if tt.setup != nil {
 				tt.setup(t, mount)
 			}
@@ -91,7 +92,8 @@ func TestMount_Put(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mount := NewMount()
+			tempPath := t.TempDir()
+			mount := NewMount(TargetPath(tempPath))
 			if tt.setup != nil {
 				tt.setup(t, mount)
 			}
