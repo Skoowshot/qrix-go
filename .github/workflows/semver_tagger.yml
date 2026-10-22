@@ -1,0 +1,40 @@
+name: Semantic Versioning Tagger
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+    
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version Bump
+        id: bump_type
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          BODY="${{ github.event.pull_request.body }}"
+          if [[ "$TITLE" == *"[major]"* ]] || [[ "$BODY" == *"[major]"* ]]; then
+            echo "type=major" >> $GITHUB_OUTPUT
+          elif [[ "$TITLE" == *"[minor]"* ]] || [[ "$BODY" == *"[minor]"* ]]; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Git Tag
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: ${{ steps.bump_type.outputs.type }}
+          INITIAL_VERSION: 0.0.0
