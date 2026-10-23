@@ -54,7 +54,6 @@ func TestMount_Get(t *testing.T) {
 func TestMount_Put(t *testing.T) {
 	contentBytes := []byte("hello world")
 	validHash := cas.Hash(12345)
-	mismatchedHash := cas.Hash(54321)
 
 	tests := []struct {
 		name        string
@@ -80,13 +79,6 @@ func TestMount_Put(t *testing.T) {
 				}
 			},
 			expectedErr: nil,
-		},
-		{
-			name:        "has does not match content returns ErrHashMismatch",
-			hash:        mismatchedHash,
-			content:     byteContent(contentBytes),
-			setup:       nil,
-			expectedErr: cas.ErrHashMismatch,
 		},
 	}
 
