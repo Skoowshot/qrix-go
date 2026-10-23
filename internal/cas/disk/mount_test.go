@@ -32,7 +32,7 @@ func TestMount_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempPath := t.TempDir()
-			mount := NewMount(TargetPath(tempPath), 1, 2)
+			mount := NewMount(TargetPath(tempPath), FlatLayout())
 			if tt.setup != nil {
 				tt.setup(t, mount)
 			}
@@ -85,15 +85,15 @@ func TestMount_Put(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempPath := t.TempDir()
-			mount := NewMount(TargetPath(tempPath), 1, 2)
+			mount := NewMount(TargetPath(tempPath), FlatLayout())
 			if tt.setup != nil {
 				tt.setup(t, mount)
 			}
 
 			err := mount.Put(tt.hash, tt.content)
 
-			if errors.Is(err, tt.expectedErr) {
-				t.Errorf("error = %v, expected %v", err, tt.expectedErr)
+			if !errors.Is(err, tt.expectedErr) {
+				t.Errorf("error = %v, want %v", err, tt.expectedErr)
 			}
 		})
 	}
@@ -111,7 +111,7 @@ func setupContentFromBytes(hash cas.Hash, contentBytes []byte) func(t *testing.T
 func validateErr(expectedErr error) func(t *testing.T, content cas.Content, err error) {
 	return func(t *testing.T, content cas.Content, err error) {
 		if !errors.Is(err, expectedErr) {
-			t.Errorf("error = %v, expected %v", err, expectedErr)
+			t.Errorf("error = %v, want %v", err, expectedErr)
 		}
 	}
 }
@@ -125,11 +125,11 @@ func validateContentBytes(expectedBytes []byte) func(t *testing.T, content cas.C
 			return
 		}
 		if !bytes.Equal(gotBytes, expectedBytes) {
-			t.Errorf("data = %q, expected %q", gotBytes, expectedBytes)
+			t.Errorf("data = %q, want %q", gotBytes, expectedBytes)
 			return
 		}
 		if len(gotBytes) != len(expectedBytes) {
-			t.Errorf("size = %d, expected %d", len(gotBytes), len(expectedBytes))
+			t.Errorf("size = %d, want %d", len(gotBytes), len(expectedBytes))
 			return
 		}
 	}
