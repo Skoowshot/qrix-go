@@ -8,20 +8,17 @@ import (
 type TargetPath string
 
 type Mount struct {
-	targetPath        TargetPath
-	shardingLevels    int
-	shardingLevelSize int
+	targetPath TargetPath
+	layout     Layout
 }
 
 func NewMount(
 	targetPath TargetPath,
-	shardingLevels int,
-	shardingLevelSize int,
+	layout Layout,
 ) *Mount {
 	return &Mount{
-		targetPath:        targetPath,
-		shardingLevels:    shardingLevels,
-		shardingLevelSize: shardingLevelSize,
+		targetPath: targetPath,
+		layout:     layout,
 	}
 }
 
@@ -36,26 +33,7 @@ func (m *Mount) Put(hash cas.Hash, content cas.Content) error {
 }
 
 func (m *Mount) contentPath(hash cas.Hash) string {
-	relativePath := shardedPath(hash, m.shardingLevels, m.shardingLevelSize)
-	return filepath.Join(string(m.targetPath), relativePath)
-}
-
-func shardedPath(hash cas.Hash, shardingLevels int, levelSize int) string {
-	hexHash := hash.HexString()
-	if shardingLevels <= 0 || levelSize <= 0 {
-		return hexHash
-	}
-
-	prefixLen := shardingLevels * levelSize
-	if len(hexHash) < prefixLen {
-		return hexHash
-	}
-
-	parts := make([]string, 0, shardingLevels+1)
-	for i := 0; i < prefixLen; i += levelSize {
-		parts = append(parts, hexHash[i:i+levelSize])
-	}
-	parts = append(parts, hexHash)
-
-	return filepath.Join(parts...)
+	rootPath := string(m.targetPath)
+	relativePath := m.layout(hash)
+	return filepath.Join(rootPath, relativePath)
 }
