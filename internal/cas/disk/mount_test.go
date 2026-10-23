@@ -39,7 +39,7 @@ func TestMount_Get(t *testing.T) {
 
 			content, err := mount.Get(tt.hash)
 			if content != nil {
-				defer content.Close()
+				defer cas.SilentClose(content)
 			}
 
 			if tt.validate == nil {
@@ -65,16 +65,16 @@ func TestMount_Put(t *testing.T) {
 		{
 			name:        "new content put successfully",
 			hash:        validHash,
-			content:     byteContent(contentBytes),
+			content:     cas.InMemoryContent(contentBytes),
 			setup:       nil,
 			expectedErr: nil,
 		},
 		{
 			name:    "same content put twice successfully",
 			hash:    validHash,
-			content: byteContent(contentBytes),
+			content: cas.InMemoryContent(contentBytes),
 			setup: func(t *testing.T, m cas.Mount) {
-				if err := m.Put(validHash, byteContent(contentBytes)); err != nil {
+				if err := m.Put(validHash, cas.InMemoryContent(contentBytes)); err != nil {
 					t.Fatalf("setup failed: %v", err)
 				}
 			},
@@ -101,7 +101,7 @@ func TestMount_Put(t *testing.T) {
 
 func setupContentFromBytes(hash cas.Hash, contentBytes []byte) func(t *testing.T, m cas.Mount) {
 	return func(t *testing.T, m cas.Mount) {
-		err := m.Put(hash, byteContent(contentBytes))
+		err := m.Put(hash, cas.InMemoryContent(contentBytes))
 		if err != nil {
 			t.Fatalf("failed to setup test data: %v", err)
 		}
@@ -133,8 +133,4 @@ func validateContentBytes(expectedBytes []byte) func(t *testing.T, content cas.C
 			return
 		}
 	}
-}
-
-func byteContent(contentBytes []byte) cas.Content {
-	return io.NopCloser(bytes.NewReader(contentBytes))
 }

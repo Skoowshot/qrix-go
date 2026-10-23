@@ -28,7 +28,7 @@ func InMemoryContent(data []byte) Content {
 }
 
 func Buffer(content Content) (Content, error) {
-	defer content.Close()
+	defer SilentClose(content)
 
 	data, err := io.ReadAll(content)
 	if err != nil {
