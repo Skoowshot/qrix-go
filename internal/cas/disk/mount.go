@@ -12,6 +12,7 @@ import (
 const standardDirPerms os.FileMode = 0755
 const putTemporaryFilePattern = "put-*"
 
+// TargetPath is a string filepath for disk.Mount content target directory.
 type TargetPath string
 
 // Mount is a physical disk implementation of cas.Mount, laying out files by given Layout at the given TargetPath

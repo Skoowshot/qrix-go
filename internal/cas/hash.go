@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 )
 
+// Hash is a unique 64-bit representation of content for usage in CAS.
 type Hash uint64
 
 func (h Hash) Bytes() []byte {

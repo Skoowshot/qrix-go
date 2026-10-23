@@ -7,14 +7,17 @@ import (
 
 const shardingLevelSize = 2
 
+// Layout defines how the contents are aligned inside of disk.Mount.
 type Layout func(hash cas.Hash) string
 
+// FlatLayout aligns the contents flat, all files in the same directory.
 func FlatLayout() Layout {
 	return func(hash cas.Hash) string {
 		return hash.HexString()
 	}
 }
 
+// ShardedLayout shards the contents by defined levels, files split into multiple directories.
 func ShardedLayout(shardingLevels int) Layout {
 	return func(hash cas.Hash) string {
 		hexHash := hash.HexString()
