@@ -1,4 +1,4 @@
-package disk
+package mount
 
 import (
 	"errors"
@@ -7,25 +7,23 @@ import (
 	"os"
 	"path/filepath"
 	"qrix-runtime/internal/cas"
+	"qrix-runtime/internal/cas/disk"
 )
 
 const standardDirPerms os.FileMode = 0755
 const putTemporaryFilePattern = "put-*"
 
-// TargetPath is a string filepath for disk.Mount content target directory.
-type TargetPath string
-
-// Mount is a physical disk implementation of cas.Mount, laying out files by given Layout at the given TargetPath
-type Mount struct {
-	targetPath TargetPath
-	layout     Layout
+// Disk is a physical disk implementation of cas.Mount, laying out files by given Layout at the given TargetPath
+type Disk struct {
+	targetPath string
+	layout     disk.Layout
 }
 
-func NewMount(
-	targetPath TargetPath,
-	layout Layout,
-) *Mount {
-	return &Mount{
+func NewDisk(
+	targetPath string,
+	layout disk.Layout,
+) *Disk {
+	return &Disk{
 		targetPath: targetPath,
 		layout:     layout,
 	}
@@ -34,7 +32,7 @@ func NewMount(
 // Get retrieves the content from the storage by the given hash.
 // Opens the file and returns the content as cas.StreamContent.
 // The returned content should be closed after usage.
-func (m *Mount) Get(hash cas.Hash) (cas.Content, error) {
+func (m *Disk) Get(hash cas.Hash) (cas.Content, error) {
 	contentFilepath := m.contentPath(hash)
 	reader, err := os.Open(contentFilepath)
 	if err != nil {
@@ -49,7 +47,7 @@ func (m *Mount) Get(hash cas.Hash) (cas.Content, error) {
 }
 
 // Has checks if the content exists by the given hash.
-func (m *Mount) Has(hash cas.Hash) (bool, error) {
+func (m *Disk) Has(hash cas.Hash) (bool, error) {
 	contentFilepath := m.contentPath(hash)
 
 	_, err := os.Stat(contentFilepath)
@@ -66,7 +64,7 @@ func (m *Mount) Has(hash cas.Hash) (bool, error) {
 
 // Put saves the content to the storage by the given hash.
 // Uses atomic write using a temporary file, preventing data corruption.
-func (m *Mount) Put(hash cas.Hash, content cas.Content) error {
+func (m *Disk) Put(hash cas.Hash, content cas.Content) error {
 	defer cas.SilentClose(content)
 
 	contentFilepath := m.contentPath(hash)
@@ -110,8 +108,8 @@ func (m *Mount) Put(hash cas.Hash, content cas.Content) error {
 	return nil
 }
 
-func (m *Mount) contentPath(hash cas.Hash) string {
-	rootPath := string(m.targetPath)
+func (m *Disk) contentPath(hash cas.Hash) string {
+	rootPath := m.targetPath
 	relativePath := m.layout(hash)
 	return filepath.Join(rootPath, relativePath)
 }
