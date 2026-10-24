@@ -1,14 +1,15 @@
-package disk
+package mount
 
 import (
 	"bytes"
 	"errors"
 	"io"
 	"qrix-runtime/internal/cas"
+	"qrix-runtime/internal/cas/disk"
 	"testing"
 )
 
-func TestMount_Get(t *testing.T) {
+func TestDisk_Get(t *testing.T) {
 	tests := []struct {
 		name     string
 		hash     cas.Hash
@@ -32,7 +33,7 @@ func TestMount_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempPath := t.TempDir()
-			mount := NewMount(TargetPath(tempPath), FlatLayout())
+			mount := NewDisk(tempPath, disk.FlatLayout())
 			if tt.setup != nil {
 				tt.setup(t, mount)
 			}
@@ -51,7 +52,46 @@ func TestMount_Get(t *testing.T) {
 	}
 }
 
-func TestMount_Put(t *testing.T) {
+func TestDisk_Has(t *testing.T) {
+	tests := []struct {
+		name     string
+		hash     cas.Hash
+		setup    func(t *testing.T, m cas.Mount)
+		validate func(t *testing.T, exists bool, err error)
+	}{
+		{
+			name:     "existing content returns true",
+			hash:     cas.Hash(12345),
+			setup:    setupContentFromBytes(cas.Hash(12345), []byte("hello world")),
+			validate: validateBool(true),
+		},
+		{
+			name:     "missing content returns false",
+			hash:     cas.Hash(12345),
+			setup:    nil,
+			validate: validateBool(false),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tempPath := t.TempDir()
+			mount := NewDisk(tempPath, disk.FlatLayout())
+			if tt.setup != nil {
+				tt.setup(t, mount)
+			}
+
+			exists, err := mount.Has(tt.hash)
+			if tt.validate == nil {
+				return
+			}
+
+			tt.validate(t, exists, err)
+		})
+	}
+}
+
+func TestDisk_Put(t *testing.T) {
 	contentBytes := []byte("hello world")
 	validHash := cas.Hash(12345)
 
@@ -85,7 +125,7 @@ func TestMount_Put(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempPath := t.TempDir()
-			mount := NewMount(TargetPath(tempPath), FlatLayout())
+			mount := NewDisk(tempPath, disk.FlatLayout())
 			if tt.setup != nil {
 				tt.setup(t, mount)
 			}
@@ -96,6 +136,18 @@ func TestMount_Put(t *testing.T) {
 				t.Errorf("error = %v, want %v", err, tt.expectedErr)
 			}
 		})
+	}
+}
+
+func validateBool(expected bool) func(t *testing.T, exists bool, err error) {
+	return func(t *testing.T, exists bool, err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatalf("err = %v, want = nil", err)
+		}
+		if exists != expected {
+			t.Errorf("exists = %v, want = %v", exists, expected)
+		}
 	}
 }
 
