@@ -1,38 +1,38 @@
-package stream
+package dest
 
 import (
 	"io"
 	"qrix-runtime/internal/asset"
 )
 
-var _ asset.Dest = (*Dest)(nil)
+var _ asset.Dest = (*Stream)(nil)
 
-// Dest represents an implementation of asset.Dest that wraps an io.WriteCloser
+// Stream represents an implementation of asset.Dest that wraps an io.WriteCloser
 // and carries a specific asset.DestType.
-type Dest struct {
+type Stream struct {
 	destType asset.DestType
 	writer   io.WriteCloser
 }
 
-// NewDest initializes and returns a new Dest instance.
-func NewDest(destType asset.DestType, writer io.WriteCloser) *Dest {
-	return &Dest{
+// NewStream initializes and returns a new Stream instance.
+func NewStream(destType asset.DestType, writer io.WriteCloser) *Stream {
+	return &Stream{
 		destType: destType,
 		writer:   writer,
 	}
 }
 
 // Type returns the destination type associated with this stream.
-func (s *Dest) Type() asset.DestType {
+func (s *Stream) Type() asset.DestType {
 	return s.destType
 }
 
 // Write writes data to the underlying writer stream.
-func (s *Dest) Write(p []byte) (n int, err error) {
+func (s *Stream) Write(p []byte) (n int, err error) {
 	return s.writer.Write(p)
 }
 
 // Close closes the underlying writer stream.
-func (s *Dest) Close() error {
+func (s *Stream) Close() error {
 	return s.writer.Close()
 }
