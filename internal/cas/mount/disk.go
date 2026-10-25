@@ -14,6 +14,8 @@ import (
 const standardDirPerms os.FileMode = 0755
 const putTemporaryFilePattern = "put-*"
 
+var _ cas.Mount = (*Disk)(nil)
+
 // Disk is a physical disk implementation of cas.Mount, laying out files by given Layout at the given TargetPath
 type Disk struct {
 	targetPath string
