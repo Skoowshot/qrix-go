@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"qrix-runtime/internal/cas"
-	"qrix-runtime/internal/cas/disk"
 	"testing"
+
+	"github.com/Skoowshot/qrix-runtime/internal/cas"
+	"github.com/Skoowshot/qrix-runtime/internal/cas/disk"
 )
 
 func TestDisk_Get(t *testing.T) {

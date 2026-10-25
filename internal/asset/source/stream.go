@@ -2,7 +2,8 @@ package source
 
 import (
 	"io"
-	"qrix-runtime/internal/asset"
+
+	"github.com/Skoowshot/qrix-runtime/internal/asset"
 )
 
 var _ asset.Source = (*Stream)(nil)

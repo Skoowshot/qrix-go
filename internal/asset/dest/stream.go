@@ -2,7 +2,8 @@ package dest
 
 import (
 	"io"
-	"qrix-runtime/internal/asset"
+
+	"github.com/Skoowshot/qrix-runtime/internal/asset"
 )
 
 var _ asset.Dest = (*Stream)(nil)

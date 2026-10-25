@@ -6,8 +6,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"qrix-runtime/internal/cas"
-	"qrix-runtime/internal/cas/disk"
+
+	"github.com/Skoowshot/qrix-runtime/internal/cas"
+	"github.com/Skoowshot/qrix-runtime/internal/cas/disk"
 )
 
 const standardDirPerms os.FileMode = 0755
