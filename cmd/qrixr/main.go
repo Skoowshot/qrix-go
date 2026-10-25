@@ -1,7 +1,7 @@
 package main
 
 import (
-	"qrix-runtime/internal/app"
+	"github.com/Skoowshot/qrix-runtime/internal/app"
 )
 
 func main() {

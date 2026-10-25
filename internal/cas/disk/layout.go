@@ -2,7 +2,8 @@ package disk
 
 import (
 	"path/filepath"
-	"qrix-runtime/internal/cas"
+
+	"github.com/Skoowshot/qrix-runtime/internal/cas"
 )
 
 const shardingLevelSize = 2

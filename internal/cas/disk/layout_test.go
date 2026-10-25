@@ -2,8 +2,9 @@ package disk
 
 import (
 	"path/filepath"
-	"qrix-runtime/internal/cas"
 	"testing"
+
+	"github.com/Skoowshot/qrix-runtime/internal/cas"
 )
 
 func TestFlatLayout(t *testing.T) {
