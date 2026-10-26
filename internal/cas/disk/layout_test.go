@@ -8,8 +8,8 @@ import (
 )
 
 func TestFlatLayout(t *testing.T) {
-	const sampleHash = cas.Hash(0x0102030405060708)
-	const hexStr = "0102030405060708"
+	sampleHash := cas.Hash([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
+	hexStr := sampleHash.HexString()
 
 	tests := []struct {
 		name   string
@@ -36,8 +36,8 @@ func TestFlatLayout(t *testing.T) {
 }
 
 func TestShardedLayout(t *testing.T) {
-	const sampleHash = cas.Hash(0x0102030405060708)
-	const hexStr = "0102030405060708"
+	sampleHash := cas.Hash([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
+	hexStr := sampleHash.HexString()
 
 	tests := []struct {
 		name   string
@@ -54,8 +54,8 @@ func TestShardedLayout(t *testing.T) {
 		{
 			name:   "Zero hash keeps leading zeros",
 			layout: ShardedLayout(2),
-			hash:   cas.Hash(0),
-			want:   filepath.Join("00", "00", "0000000000000000"),
+			hash:   cas.Hash([16]byte{}),
+			want:   filepath.Join("00", "00", "00000000000000000000000000000000"),
 		},
 		{
 			name:   "Zero or negative levels fallback to flat",
@@ -65,7 +65,7 @@ func TestShardedLayout(t *testing.T) {
 		},
 		{
 			name:   "Prefix longer than hash length falls back to flat",
-			layout: ShardedLayout(10), // 20 > 16
+			layout: ShardedLayout(20), // 40 > 32
 			hash:   sampleHash,
 			want:   hexStr,
 		},
