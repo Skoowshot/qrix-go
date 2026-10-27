@@ -20,10 +20,13 @@ func XXH3Hasher() Hasher {
 		}
 
 		u128 := h.Sum128()
-
-		var out Hash
-		binary.BigEndian.PutUint64(out[0:8], u128.Hi)
-		binary.BigEndian.PutUint64(out[8:16], u128.Lo)
-		return out, nil
+		return uint128ToHash(u128), nil
 	}
+}
+
+func uint128ToHash(u128 xxh3.Uint128) Hash {
+	var out Hash
+	binary.BigEndian.PutUint64(out[0:8], u128.Hi)
+	binary.BigEndian.PutUint64(out[8:16], u128.Lo)
+	return out
 }
