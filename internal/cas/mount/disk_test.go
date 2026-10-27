@@ -11,6 +11,8 @@ import (
 )
 
 func TestDisk_Get(t *testing.T) {
+	sampleHash := cas.Hash([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
+
 	tests := []struct {
 		name     string
 		hash     cas.Hash
@@ -19,13 +21,13 @@ func TestDisk_Get(t *testing.T) {
 	}{
 		{
 			name:     "existing content is returned successfully",
-			hash:     cas.Hash(12345),
-			setup:    setupContentFromBytes(cas.Hash(12345), []byte("hello world")),
+			hash:     sampleHash,
+			setup:    setupContentFromBytes(sampleHash, []byte("hello world")),
 			validate: validateContentBytes([]byte("hello world")),
 		},
 		{
 			name:     "missing content returns ErrNotFound",
-			hash:     cas.Hash(12345),
+			hash:     sampleHash,
 			setup:    nil,
 			validate: validateErr(cas.ErrNotFound),
 		},
@@ -54,6 +56,8 @@ func TestDisk_Get(t *testing.T) {
 }
 
 func TestDisk_Has(t *testing.T) {
+	sampleHash := cas.Hash([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
+
 	tests := []struct {
 		name     string
 		hash     cas.Hash
@@ -62,13 +66,13 @@ func TestDisk_Has(t *testing.T) {
 	}{
 		{
 			name:     "existing content returns true",
-			hash:     cas.Hash(12345),
-			setup:    setupContentFromBytes(cas.Hash(12345), []byte("hello world")),
+			hash:     sampleHash,
+			setup:    setupContentFromBytes(sampleHash, []byte("hello world")),
 			validate: validateBool(true),
 		},
 		{
 			name:     "missing content returns false",
-			hash:     cas.Hash(12345),
+			hash:     sampleHash,
 			setup:    nil,
 			validate: validateBool(false),
 		},
@@ -94,7 +98,7 @@ func TestDisk_Has(t *testing.T) {
 
 func TestDisk_Put(t *testing.T) {
 	contentBytes := []byte("hello world")
-	validHash := cas.Hash(12345)
+	validHash := cas.Hash([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
 
 	tests := []struct {
 		name        string
