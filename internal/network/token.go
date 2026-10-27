@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Token is a 128-bit authentication token used to verify a Peer.
+// Token is a 128-bit token used for authentication.
 type Token [16]byte
 
 // GenerateToken uses crypto random to generate a unique Token.
