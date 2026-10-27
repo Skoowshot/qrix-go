@@ -4,6 +4,12 @@ import (
 	"io"
 )
 
+// CodecID is a runtime identifier of Codec, used for hot-path access.
+type CodecID uint64
+
+// CodecName is a persistent identifier of Codec, used for saving and loading.
+type CodecName string
+
 // Codec handles decoding and encoding of asset data.
 type Codec interface {
 	// Decode reads and decodes data from the provided source.
