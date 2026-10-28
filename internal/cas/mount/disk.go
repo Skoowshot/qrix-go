@@ -37,6 +37,10 @@ func NewDisk(
 // Opens the file and returns the content as cas.StreamContent.
 // The returned content should be closed after usage.
 func (m *Disk) Get(ctx context.Context, hash cas.Hash) (cas.Content, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
 	contentFilepath := m.contentPath(hash)
 	reader, err := os.Open(contentFilepath)
 	if err != nil {
@@ -52,6 +56,10 @@ func (m *Disk) Get(ctx context.Context, hash cas.Hash) (cas.Content, error) {
 
 // Has checks if the content exists by the given hash.
 func (m *Disk) Has(ctx context.Context, hash cas.Hash) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+
 	contentFilepath := m.contentPath(hash)
 
 	_, err := os.Stat(contentFilepath)
@@ -80,6 +88,10 @@ func (m *Disk) Put(ctx context.Context, hash cas.Hash, content cas.Content) erro
 		return nil
 	}
 
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	dir := filepath.Dir(contentFilepath)
 	if err := os.MkdirAll(dir, standardDirPerms); err != nil {
 		return fmt.Errorf("create sharded directories: %w", err)
@@ -101,8 +113,16 @@ func (m *Disk) Put(ctx context.Context, hash cas.Hash, content cas.Content) erro
 		return fmt.Errorf("copy content to temp: %w", err)
 	}
 
+	if err := tmpFile.Sync(); err != nil {
+		return fmt.Errorf("sync temp file: %w", err)
+	}
+
 	if err := tmpFile.Close(); err != nil {
 		return fmt.Errorf("close temp file: %w", err)
+	}
+
+	if err := ctx.Err(); err != nil {
+		return err
 	}
 
 	if err := os.Rename(tmpName, contentFilepath); err != nil {
