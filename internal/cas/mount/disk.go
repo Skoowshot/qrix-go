@@ -1,6 +1,7 @@
 package mount
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -35,7 +36,7 @@ func NewDisk(
 // Get retrieves the content from the storage by the given hash.
 // Opens the file and returns the content as cas.StreamContent.
 // The returned content should be closed after usage.
-func (m *Disk) Get(hash cas.Hash) (cas.Content, error) {
+func (m *Disk) Get(ctx context.Context, hash cas.Hash) (cas.Content, error) {
 	contentFilepath := m.contentPath(hash)
 	reader, err := os.Open(contentFilepath)
 	if err != nil {
@@ -50,7 +51,7 @@ func (m *Disk) Get(hash cas.Hash) (cas.Content, error) {
 }
 
 // Has checks if the content exists by the given hash.
-func (m *Disk) Has(hash cas.Hash) (bool, error) {
+func (m *Disk) Has(ctx context.Context, hash cas.Hash) (bool, error) {
 	contentFilepath := m.contentPath(hash)
 
 	_, err := os.Stat(contentFilepath)
@@ -67,11 +68,11 @@ func (m *Disk) Has(hash cas.Hash) (bool, error) {
 
 // Put saves the content to the storage by the given hash.
 // Uses atomic write using a temporary file, preventing data corruption.
-func (m *Disk) Put(hash cas.Hash, content cas.Content) error {
+func (m *Disk) Put(ctx context.Context, hash cas.Hash, content cas.Content) error {
 	defer cas.SilentClose(content)
 
 	contentFilepath := m.contentPath(hash)
-	exists, err := m.Has(hash)
+	exists, err := m.Has(ctx, hash)
 	if err != nil {
 		return fmt.Errorf("check if content exists: %w", err)
 	}
