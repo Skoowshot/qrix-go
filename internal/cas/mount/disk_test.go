@@ -2,6 +2,7 @@ package mount
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"testing"
@@ -41,7 +42,8 @@ func TestDisk_Get(t *testing.T) {
 				tt.setup(t, mount)
 			}
 
-			content, err := mount.Get(tt.hash)
+			ctx := context.Background()
+			content, err := mount.Get(ctx, tt.hash)
 			if content != nil {
 				defer cas.SilentClose(content)
 			}
@@ -86,7 +88,8 @@ func TestDisk_Has(t *testing.T) {
 				tt.setup(t, mount)
 			}
 
-			exists, err := mount.Has(tt.hash)
+			ctx := context.Background()
+			exists, err := mount.Has(ctx, tt.hash)
 			if tt.validate == nil {
 				return
 			}
@@ -119,7 +122,8 @@ func TestDisk_Put(t *testing.T) {
 			hash:    validHash,
 			content: cas.InMemoryContent(contentBytes),
 			setup: func(t *testing.T, m cas.Mount) {
-				if err := m.Put(validHash, cas.InMemoryContent(contentBytes)); err != nil {
+				ctx := context.Background()
+				if err := m.Put(ctx, validHash, cas.InMemoryContent(contentBytes)); err != nil {
 					t.Fatalf("setup failed: %v", err)
 				}
 			},
@@ -135,7 +139,8 @@ func TestDisk_Put(t *testing.T) {
 				tt.setup(t, mount)
 			}
 
-			err := mount.Put(tt.hash, tt.content)
+			ctx := context.Background()
+			err := mount.Put(ctx, tt.hash, tt.content)
 
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("error = %v, want %v", err, tt.expectedErr)
@@ -158,7 +163,8 @@ func validateBool(expected bool) func(t *testing.T, exists bool, err error) {
 
 func setupContentFromBytes(hash cas.Hash, contentBytes []byte) func(t *testing.T, m cas.Mount) {
 	return func(t *testing.T, m cas.Mount) {
-		err := m.Put(hash, cas.InMemoryContent(contentBytes))
+		ctx := context.Background()
+		err := m.Put(ctx, hash, cas.InMemoryContent(contentBytes))
 		if err != nil {
 			t.Fatalf("failed to setup test data: %v", err)
 		}
