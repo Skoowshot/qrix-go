@@ -24,14 +24,10 @@ func (app *App) Start() error {
 	if err != nil {
 		return fmt.Errorf("create control server: %w", err)
 	}
-	netServer, err := server.ListenNetwork(":7179")
-	if err != nil {
-		return fmt.Errorf("create network server: %w", err)
-	}
+
 	app.servers = append(
 		app.servers,
 		ctrlServer,
-		netServer,
 	)
 
 	for _, s := range app.servers {
